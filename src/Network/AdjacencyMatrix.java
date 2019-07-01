@@ -6,6 +6,10 @@ import java.util.List;
 public class AdjacencyMatrix {
 
 	final static int INF = NetworkInterface.INF;
+	final static int weightHC = 1;
+	final static int weightMC = 3;
+	final static int weightLC = 10;
+	
 	int n;
 	int[][] a = {};
 
@@ -23,9 +27,9 @@ public class AdjacencyMatrix {
 		}
 	}
 
-	void addEdge(int i, int j) {
-		a[i][j] = 1;
-		a[j][i] = 1;
+	void addEdge(int i, int j, int weight) {
+		a[i][j] = weight;
+		a[j][i] = weight;
 	}
 
 	void removeEdge(int i, int j) {
@@ -41,20 +45,54 @@ public class AdjacencyMatrix {
 		System.out.println("Matrix size: " + size);
 		AdjacencyMatrix matrix = new AdjacencyMatrix(size);
 
+		// add edges for LC interactions 		TODO: consolidate redundant code for HC MC LC interactions
+		System.out.println("Adding edges for low confidence interactions...");
 		for (int i = 0; i < size; i++) {
-			List<String> interactingProteinsTemp = new ArrayList<>();
-			interactingProteinsTemp = ppiData.proteinSet.get(i).interactingProteins;
+			List<String> interactionsLC = ppiData.proteinSet.get(i).interactionsLC;
 
-			for (int j = 0; j < interactingProteinsTemp.size(); j++) {
-				int interactingProteinIndex = ppiData.proteinNames.indexOf(interactingProteinsTemp.get(j));
+			for (int j = 0; j < interactionsLC.size(); j++) {
+				int interactingProteinIndex = ppiData.proteinNames.indexOf(interactionsLC.get(j));
 				if (interactingProteinIndex == -1) {
-					// System.out.println("Interacting protein not found; edge not created");
+					// System.out.println("No interacting proteins found; edge not created");
 					continue;
 				}
-				matrix.addEdge(i, interactingProteinIndex);
-				matrix.addEdge(interactingProteinIndex, i);
+				matrix.addEdge(i, interactingProteinIndex, weightLC);
+				matrix.addEdge(interactingProteinIndex, i, weightLC);
 			}
 		}
+		
+		// add edges for MC interactions 		TODO: consolidate redundant code for HC MC LC interactions
+		System.out.println("Adding edges for medium confidence interactions...");
+		for (int i = 0; i < size; i++) {
+			List<String> interactionsMC = ppiData.proteinSet.get(i).interactionsMC;
+
+			for (int j = 0; j < interactionsMC.size(); j++) {
+				int interactingProteinIndex = ppiData.proteinNames.indexOf(interactionsMC.get(j));
+				if (interactingProteinIndex == -1) {
+					// System.out.println("No interacting proteins found; edge not created");
+					continue;
+				}
+				matrix.addEdge(i, interactingProteinIndex, weightMC);
+				matrix.addEdge(interactingProteinIndex, i, weightMC);
+			}
+		}
+		
+		// add edges for HC interactions 		TODO: consolidate redundant code for HC MC LC interactions
+		System.out.println("Adding edges for high confidence interactions...");
+		for (int i = 0; i < size; i++) {
+			List<String> interactionsHC = ppiData.proteinSet.get(i).interactionsHC;
+
+			for (int j = 0; j < interactionsHC.size(); j++) {
+				int interactingProteinIndex = ppiData.proteinNames.indexOf(interactionsHC.get(j));
+				if (interactingProteinIndex == -1) {
+					// System.out.println("No interacting proteins found; edge not created");
+					continue;
+				}
+				matrix.addEdge(i, interactingProteinIndex, weightHC);
+				matrix.addEdge(interactingProteinIndex, i, weightHC);
+			}
+		}
+		
 		return matrix;
 	}
 	

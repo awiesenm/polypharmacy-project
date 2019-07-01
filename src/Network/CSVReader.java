@@ -20,15 +20,27 @@ public class CSVReader {
 
 			while (line != null) {
 
-				String[] row_contents = line.split(",");
+				String[] rowContents = line.split(";");
 				// System.out.println(row_contents[0]);
 				PPIProtein protein = new PPIProtein();
-				for (int i = 0; i < row_contents.length; i++) {
+				for (int i = 0; i < rowContents.length; i++) {
 					if (i == 0) {
-						protein.proteinName = row_contents[i];
+						protein.proteinName = rowContents[i];
 						ppiData.proteinNames.add(protein.proteinName);
 					} else {
-						protein.interactingProteins.add(row_contents[i]);
+						String cell = rowContents[i];
+						String[] cellContents = cell.split(",");
+						for (int j = 0; j < cellContents.length; j++) {
+							if (i == 1) {
+								protein.interactionsHC.add(cellContents[j]);
+							} else if (i == 2) {
+								protein.interactionsMC.add(cellContents[j]);
+							} else if (i == 3) {
+								protein.interactionsLC.add(cellContents[j]);
+							} else {
+								System.out.println("Error recording interacting proteins");
+							}
+						}
 					}
 				}
 				ppiData.proteinSet.add(protein);

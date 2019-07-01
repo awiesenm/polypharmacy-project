@@ -5,7 +5,9 @@ import java.util.List;
 
 public class PPIProtein {
 	String proteinName;
-	List<String> interactingProteins = new ArrayList<>();
+	List<String> interactionsHC = new ArrayList<>();
+	List<String> interactionsMC = new ArrayList<>();
+	List<String> interactionsLC = new ArrayList<>();
 	
 
 }
